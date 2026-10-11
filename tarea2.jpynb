@@ -1,22 +1,112 @@
 #primera forma ITERATIVA DE FIBONACHI#
 
+from time import perf_counter
+
+limite_recursivo = None
+casos_timeout = []
+
 
 def fibonacci_iterativo(n):
     arreglo = [0,1];
     if n < 0:
         return -1;
-    
+
     elif n == 0:
         return arreglo[0];
-    
+
     elif n == 1:
         return arreglo[1];
     else:
         for i in range(2,n+1):
             arreglo.append(arreglo[i-1] + arreglo[i-2])
-        print(arreglo)
         return arreglo[n]
-while True:
+
+while False:
     print("Ingrese un numero: ")
     n = int(input())
     print(fibonacci_iterativo(n))
+
+#segunda  forma RECURSICVA DE FIBONACHI#
+
+def fibonachi_recursivo(n):
+    # Detener el calculo si se acaba el tiempo
+    if limite_recursivo is not None:
+        if perf_counter() >= limite_recursivo:
+            raise TimeoutError
+
+    arreglo = [0,1];
+    if n < 0:
+        return -1;
+
+    elif n == 0:
+        return arreglo[0];
+
+    elif n == 1:
+        return arreglo[1];
+    else:
+        return fibonachi_recursivo(n-1)+fibonachi_recursivo(n-2)
+
+while False:
+    print("Ingrese un numero: ")
+    n = int(input())
+    print(fibonachi_recursivo(n))
+
+#impresiones
+valores_n = [1, 2, 5, 8, 10, 12, 15, 20, 25, 50, 100]
+tiempos_iterativos = []
+tiempos_recursivos = []
+
+import matplotlib.pyplot as plt
+
+for n in valores_n:
+    # Medir el metodo iterativo
+    inicio = perf_counter()
+    resultado_iterativo = fibonacci_iterativo(n)
+    fin = perf_counter()
+    tiempos_iterativos.append(fin - inicio)
+
+    # Medir el metodo recursivo
+    inicio = perf_counter()
+    limite_recursivo = inicio + 10
+
+    try:
+        resultado_recursivo = fibonachi_recursivo(n)
+        fin = perf_counter()
+        tiempos_recursivos.append(fin - inicio)
+
+    except TimeoutError:
+        resultado_recursivo = "No termino en 10 segundos"
+        tiempos_recursivos.append(float("nan"))
+        casos_timeout.append(n)
+
+    finally:
+        limite_recursivo = None
+
+    # Mostrar resultados fuera de la medicipn
+    print("n:", n,
+          "Iterativo:", resultado_iterativo,
+          "Recursivo:", resultado_recursivo)
+
+plt.figure(figsize=(10, 6))
+
+plt.plot(valores_n, tiempos_iterativos, marker="o", label="Iterativo")
+plt.plot(valores_n, tiempos_recursivos, marker="o", label="Recursivo")
+
+plt.xlabel("n")
+plt.ylabel("Tiempo de ejecución (segundos)")
+plt.title("Fibonacci: iterativo vs. recursivo")
+plt.legend()
+plt.grid(True)
+
+if casos_timeout:
+    plt.figtext(
+        0.5, 0.02,
+        f"Recursivo: n={casos_timeout} sin completar al alcanzar 10 s.\n"
+        "Estos casos no tienen un tiempo final medido.",
+        ha="center",
+        fontsize=9
+    )
+
+plt.tight_layout(rect=[0, 0.12, 1, 1])
+plt.savefig("comparacion_fibonacci.png", dpi=300)
+plt.show()
