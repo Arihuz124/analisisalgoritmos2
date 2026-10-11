@@ -1,0 +1,22 @@
+#primera forma ITERATIVA DE FIBONACHI#
+
+
+def fibonacci_iterativo(n):
+    arreglo = [0,1];
+    if n < 0:
+        return -1;
+    
+    elif n == 0:
+        return arreglo[0];
+    
+    elif n == 1:
+        return arreglo[1];
+    else:
+        for i in range(2,n+1):
+            arreglo.append(arreglo[i-1] + arreglo[i-2])
+        print(arreglo)
+        return arreglo[n]
+while True:
+    print("Ingrese un numero: ")
+    n = int(input())
+    print(fibonacci_iterativo(n))
